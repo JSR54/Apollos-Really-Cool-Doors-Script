@@ -1,0 +1,1220 @@
+-- shoutout to our devs for making ts(also this was meant to look ai to troll yall lol)
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local playerGui = player:WaitForChild("PlayerGui")
+
+local noclip = false
+local fly = false
+local speed = 60
+local fullbrightEnabled = false
+
+local originalAmbient = Lighting.Ambient
+local originalBrightness = Lighting.Brightness
+local originalClockTime = Lighting.ClockTime
+local originalFogEnd = Lighting.FogEnd
+local originalGlobalShadows = Lighting.GlobalShadows
+
+local character, root, humanoid
+local connections = {}
+
+local doorEspEnabled = false
+local keyEspEnabled = false
+local leverEspEnabled = false
+local rushEspEnabled = false
+local sallyEspEnabled = false
+local ambushEspEnabled = false
+local jeffEspEnabled = false
+local scribblesEspEnabled = false
+local brambleEspEnabled = false
+local dronesEspEnabled = false
+local tellerEspEnabled = false
+local eyesEspEnabled = false
+local blitzEspEnabled = false
+local creakEspEnabled = false
+local a60EspEnabled = false
+local a120EspEnabled = false
+local bashEspEnabled = false
+local lookmanEspEnabled = false
+local seekEspEnabled = false
+local figureEspEnabled = false
+local bookEspEnabled = false
+local screechEspEnabled = false
+local itemsEspEnabled = false
+local playerEspEnabled = false
+local playerNamesEnabled = false
+
+local sallyWarningEnabled = false
+local rushWarningEnabled = false
+local ambushWarningEnabled = false
+local jeffWarningEnabled = false
+local scribblesWarningEnabled = false
+local brambleWarningEnabled = false
+local tellerWarningEnabled = false
+local eyesWarningEnabled = false
+local blitzWarningEnabled = false
+local creakWarningEnabled = false
+local a60WarningEnabled = false
+local a120WarningEnabled = false
+local bashWarningEnabled = false
+local lookmanWarningEnabled = false
+local seekWarningEnabled = false
+local figureWarningEnabled = false
+local bookWarningEnabled = false
+local screechWarningEnabled = false
+
+local sallyAlreadyWarned = false
+local rushAlreadyWarned = false
+local ambushAlreadyWarned = false
+local jeffAlreadyWarned = false
+local scribblesAlreadyWarned = false
+local brambleAlreadyWarned = false
+local tellerAlreadyWarned = false
+local eyesAlreadyWarned = false
+local blitzAlreadyWarned = false
+local creakAlreadyWarned = false
+local a60AlreadyWarned = false
+local a120AlreadyWarned = false
+local bashAlreadyWarned = false
+local lookmanAlreadyWarned = false
+local seekAlreadyWarned = false
+local seekEyesAlreadyWarned = false
+local figureAlreadyWarned = false
+local bookAlreadyWarned = false
+local screechAlreadyWarned = false
+
+local achievementGui = Instance.new("ScreenGui")
+achievementGui.Name = "DoorsAchievements"
+achievementGui.ResetOnSpawn = false
+achievementGui.DisplayOrder = 1000
+achievementGui.Parent = playerGui
+
+local activeWarnings = {}
+
+local ACH_WIDTH  = 360
+local ACH_HEIGHT = 84
+local ACH_GAP    = 10
+local VISIBLE_X  = -380
+local HIDDEN_X   = 20
+local BASE_Y     = 0.10
+
+local function stackOffset(slot)
+	return (slot - 1) * (ACH_HEIGHT + ACH_GAP)
+end
+
+local function reflowWarnings()
+	for i, data in ipairs(activeWarnings) do
+		TweenService:Create(data.frame, TweenInfo.new(0.32, Enum.EasingStyle.Quint), {
+			Position = UDim2.new(1, VISIBLE_X, BASE_Y, stackOffset(i))
+		}):Play()
+	end
+end
+
+local function showDoorsAchievement(title, description, color)
+	color = color or Color3.fromRGB(255, 80, 80)
+
+	local card = Instance.new("Frame")
+	card.Size = UDim2.fromOffset(ACH_WIDTH, ACH_HEIGHT)
+	card.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+	card.BorderSizePixel = 0
+	card.Parent = achievementGui
+	Instance.new("UICorner", card).CornerRadius = UDim.new(0, 14)
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = color
+	stroke.Thickness = 1.5
+	stroke.Transparency = 0.35
+	stroke.Parent = card
+
+	local topShade = Instance.new("Frame")
+	topShade.Size = UDim2.new(1, 0, 0, 40)
+	topShade.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
+	topShade.BackgroundTransparency = 0.4
+	topShade.BorderSizePixel = 0
+	topShade.Parent = card
+	Instance.new("UICorner", topShade).CornerRadius = UDim.new(0, 14)
+
+	local iconFrame = Instance.new("Frame")
+	iconFrame.Size = UDim2.fromOffset(58, 58)
+	iconFrame.Position = UDim2.fromOffset(13, 13)
+	iconFrame.BackgroundColor3 = color
+	iconFrame.BorderSizePixel = 0
+	iconFrame.Parent = card
+	Instance.new("UICorner", iconFrame).CornerRadius = UDim.new(0, 12)
+
+	local iconGlow = Instance.new("UIStroke")
+	iconGlow.Color = color
+	iconGlow.Thickness = 2
+	iconGlow.Transparency = 0.55
+	iconGlow.Parent = iconFrame
+
+	local iconInner = Instance.new("Frame")
+	iconInner.Size = UDim2.fromOffset(38, 38)
+	iconInner.Position = UDim2.fromOffset(10, 10)
+	iconInner.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+	iconInner.BorderSizePixel = 0
+	iconInner.Parent = iconFrame
+	Instance.new("UICorner", iconInner).CornerRadius = UDim.new(0, 8)
+
+	local iconText = Instance.new("TextLabel")
+	iconText.Size = UDim2.fromScale(1, 1)
+	iconText.BackgroundTransparency = 1
+	iconText.Text = "!"
+	iconText.TextColor3 = color
+	iconText.Font = Enum.Font.GothamBlack
+	iconText.TextSize = 26
+	iconText.Parent = iconInner
+
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Size = UDim2.new(1, -92, 0, 26)
+	titleLabel.Position = UDim2.fromOffset(84, 17)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = title
+	titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextSize = 18
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+	titleLabel.Parent = card
+
+	local descLabel = Instance.new("TextLabel")
+	descLabel.Size = UDim2.new(1, -92, 0, 22)
+	descLabel.Position = UDim2.fromOffset(84, 45)
+	descLabel.BackgroundTransparency = 1
+	descLabel.Text = description
+	descLabel.TextColor3 = Color3.fromRGB(160, 160, 172)
+	descLabel.Font = Enum.Font.Gotham
+	descLabel.TextSize = 13
+	descLabel.TextXAlignment = Enum.TextXAlignment.Left
+	descLabel.TextYAlignment = Enum.TextYAlignment.Center
+	descLabel.TextWrapped = true
+	descLabel.Parent = card
+
+	local data = { frame = card }
+	table.insert(activeWarnings, data)
+	local slot = #activeWarnings
+
+	card.Position = UDim2.new(1, HIDDEN_X, BASE_Y, stackOffset(slot))
+	TweenService:Create(card, TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Position = UDim2.new(1, VISIBLE_X, BASE_Y, stackOffset(slot))
+	}):Play()
+
+	task.delay(5.5, function()
+		if not card.Parent then return end
+		local tween = TweenService:Create(card, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
+			Position = UDim2.new(1, HIDDEN_X, BASE_Y, stackOffset(slot))
+		})
+		tween:Play()
+		tween.Completed:Wait()
+		for i, d in ipairs(activeWarnings) do
+			if d == data then table.remove(activeWarnings, i) break end
+		end
+		card:Destroy()
+		reflowWarnings()
+	end)
+end
+
+local function isValidEntity(obj)
+	if not obj or not obj.Parent then return false end
+	if not (obj:IsA("Model") or obj:IsA("BasePart")) then return false end
+	return true
+end
+
+local function findInWorkspace(names)
+	for _, n in ipairs(names) do
+		local d = workspace:FindFirstChild(n)
+		if isValidEntity(d) then return d end
+	end
+	return nil
+end
+
+local function findInContainer(container, names)
+	if not container then return nil end
+	for _, n in ipairs(names) do
+		local d = container:FindFirstChild(n)
+		if isValidEntity(d) then return d end
+	end
+	return nil
+end
+
+local function getEntity(kind)
+	if kind == "Rush" then return findInWorkspace({"RushMoving"}) end
+	if kind == "Sally" then return findInWorkspace({"SallyMoving"}) end
+	if kind == "Ambush" then return findInWorkspace({"AmbushMoving"}) end
+	if kind == "Jeff" then return findInWorkspace({"JeffTheKiller"}) end
+	if kind == "Scribbles" then return findInWorkspace({"Scribbles"}) end
+	if kind == "Bramble" then return findInWorkspace({"LiveEntityBramble"}) end
+	if kind == "Drones" then return findInWorkspace({"Drones"}) end
+	if kind == "Eyes" then return findInWorkspace({"Eyes"}) end
+	if kind == "Blitz" then return findInWorkspace({"BackdoorRush"}) end
+	if kind == "A60" then return findInWorkspace({"A60"}) end
+	if kind == "A120" then return findInWorkspace({"A120"}) end
+	if kind == "Bash" then return findInWorkspace({"BashMoving"}) end
+	if kind == "Lookman" then return findInWorkspace({"BackdoorLookman"}) end
+	if kind == "Seek" then return findInWorkspace({"SeekMoving", "Seek"}) end
+
+	if kind == "Screech" then
+		local cam = workspace:FindFirstChild("Camera")
+		return findInContainer(cam, {"Screech"})
+	end
+
+	if kind == "Teller" then
+		local live = workspace:FindFirstChild("LiveEntities")
+		return findInContainer(live, {"TellerRig", "Teller"})
+	end
+
+	if kind == "Creak" then
+		local live = workspace:FindFirstChild("LiveEntities")
+		return findInContainer(live, {"Creak"})
+	end
+
+	if kind == "Figure" then
+		local rooms = workspace:FindFirstChild("CurrentRooms")
+		if rooms then
+			for _, room in ipairs(rooms:GetChildren()) do
+				local fs = room:FindFirstChild("FigureSetup")
+				if fs then
+					local rig = fs:FindFirstChild("FigureRig")
+					if isValidEntity(rig) then return rig end
+				end
+			end
+		end
+		return nil
+	end
+
+	return nil
+end
+
+local function countSeekEyes()
+	local count = 0
+	for _, obj in ipairs(workspace:GetChildren()) do
+		local n = obj.Name
+		if n == "Eye" or n == "SeekEye" or n == "Seek_Eye" then count += 1 end
+	end
+	return count
+end
+
+local bookCache = {}
+local function scanForBooks()
+	table.clear(bookCache)
+	local rooms = workspace:FindFirstChild("CurrentRooms")
+	if not rooms then return end
+	for _, room in ipairs(rooms:GetChildren()) do
+		local assets = room:FindFirstChild("Assets")
+		if assets then
+			for _, shelf in ipairs(assets:GetChildren()) do
+				if typeof(shelf) == "Instance" and shelf.Name:match("^Bookshelves") then
+					for _, child in ipairs(shelf:GetChildren()) do
+						if child.Name == "LiveHintBook" then
+							table.insert(bookCache, child)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+local function getBooks()
+	for i = #bookCache, 1, -1 do
+		local b = bookCache[i]
+		if not b or not b.Parent then table.remove(bookCache, i) end
+	end
+	if #bookCache == 0 then scanForBooks() end
+	return bookCache
+end
+
+local function findKeyInRoom(room)
+	local key = room:FindFirstChild("KeyObtain", true)
+	if key then return key end
+	key = room:FindFirstChild("Key", true)
+	if key then return key end
+	return nil
+end
+
+local function findLeverInRoom(room)
+	local lever = room:FindFirstChild("LeverForGate", true)
+	if lever then return lever end
+	local function walk(parent, depth)
+		if depth > 2 then return nil end
+		for _, child in ipairs(parent:GetChildren()) do
+			local lname = child.Name:lower()
+			if lname:find("lever") then return child end
+			if child:IsA("Folder") or child:IsA("Model") then
+				local found = walk(child, depth + 1)
+				if found then return found end
+			end
+		end
+		return nil
+	end
+	return walk(room, 1)
+end
+
+local function addEntityESP(obj, name, color)
+	if not obj or not obj.Parent then return end
+	pcall(function()
+		local target = obj
+		if not (obj:IsA("Model") or obj:IsA("BasePart")) then
+			target = obj:FindFirstChildWhichIsA("Model", true)
+				or obj:FindFirstChildWhichIsA("BasePart", true)
+			if not target then return end
+		end
+
+		local existing = target:FindFirstChild(name)
+		if existing then
+			if existing:IsA("Highlight") then
+				if existing.Adornee ~= target then existing.Adornee = target end
+				if existing.FillColor ~= color then existing.FillColor = color end
+				if existing.OutlineColor ~= color then existing.OutlineColor = color end
+			end
+			return
+		end
+
+		local h = Instance.new("Highlight")
+		h.Name = name
+		h.Adornee = target
+		h.FillColor = color
+		h.OutlineColor = color
+		h.FillTransparency = 0.4
+		h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		h.Parent = target
+	end)
+end
+
+local function addBillboard(obj, nameTag, displayText, textColor, bgColor)
+	if not obj or not obj.Parent then return end
+	pcall(function()
+		local adornee = obj
+		if not obj:IsA("BasePart") then
+			adornee = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart", true)
+			if not adornee then return end
+		end
+
+		local existing = adornee:FindFirstChild(nameTag)
+		if existing then
+			local lbl = existing:FindFirstChildWhichIsA("TextLabel", true)
+			if lbl and lbl.Text ~= displayText then lbl.Text = displayText end
+			return
+		end
+
+		local bb = Instance.new("BillboardGui")
+		bb.Name = nameTag
+		bb.Adornee = adornee
+		bb.Size = UDim2.fromOffset(150, 26)
+		bb.StudsOffset = Vector3.new(0, 2.5, 0)
+		bb.AlwaysOnTop = true
+		bb.Parent = adornee
+
+		local bg = Instance.new("Frame")
+		bg.Size = UDim2.fromScale(1, 1)
+		bg.BackgroundColor3 = bgColor or Color3.fromRGB(15, 15, 20)
+		bg.BackgroundTransparency = 0.15
+		bg.BorderSizePixel = 0
+		bg.Parent = bb
+		Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 6)
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Color = textColor or Color3.fromRGB(255, 255, 255)
+		stroke.Thickness = 1
+		stroke.Transparency = 0.5
+		stroke.Parent = bg
+
+		local text = Instance.new("TextLabel")
+		text.Size = UDim2.fromScale(1, 1)
+		text.BackgroundTransparency = 1
+		text.Text = displayText
+		text.TextColor3 = textColor or Color3.fromRGB(255, 255, 255)
+		text.Font = Enum.Font.GothamBold
+		text.TextSize = 14
+		text.Parent = bg
+	end)
+end
+
+local EXACT_DOOR_NAMES = {
+	["Door"] = true,
+	["Door1"] = true,
+	["Door2"] = true,
+	["ElevatorDoor"] = true,
+	["DoorLeft"] = true,
+	["DoorRight"] = true,
+}
+
+local function resolveDoorObject(obj)
+	if not obj then return nil end
+	if obj:IsA("BasePart") and obj.Parent and obj.Parent:IsA("Model") then
+		return obj.Parent
+	end
+	if obj:IsA("Model") or obj:IsA("BasePart") then
+		return obj
+	end
+	return nil
+end
+
+local function collectDoorsInRoom(room)
+	local doors = {}
+	local seen = {}
+
+	local function tryAdd(obj)
+		if not obj then return end
+		if not EXACT_DOOR_NAMES[obj.Name] then return end
+		if not (obj:IsA("Model") or obj:IsA("BasePart")) then return end
+
+		local resolved = resolveDoorObject(obj)
+		if not resolved then return end
+		if seen[resolved] then return end
+		seen[resolved] = true
+		table.insert(doors, resolved)
+	end
+
+	for _, child in ipairs(room:GetChildren()) do
+		tryAdd(child)
+		if child:IsA("Folder") or child:IsA("Model") then
+			for _, sub in ipairs(child:GetChildren()) do
+				tryAdd(sub)
+			end
+		end
+	end
+	return doors
+end
+
+local function cleanup()
+	for _, conn in pairs(connections) do
+		if typeof(conn) == "RBXScriptConnection" and conn.Connected then
+			conn:Disconnect()
+		end
+	end
+	table.clear(connections)
+end
+
+local function onCharacterAdded(char)
+	cleanup()
+	character = char
+	root = char:WaitForChild("HumanoidRootPart", 8)
+	humanoid = char:WaitForChild("Humanoid", 8)
+	if not root or not humanoid then return end
+
+	table.insert(connections, RunService.Stepped:Connect(function()
+		if not character or not character.Parent then return end
+		if noclip then
+			for _, part in pairs(character:GetDescendants()) do
+				if part:IsA("BasePart") then part.CanCollide = false end
+			end
+		end
+	end))
+
+	table.insert(connections, RunService.Heartbeat:Connect(function(dt)
+		if not fly or not root or not root.Parent then return end
+		root.Anchored = true
+		humanoid.PlatformStand = true
+		root.AssemblyLinearVelocity = Vector3.zero
+		root.AssemblyAngularVelocity = Vector3.zero
+
+		local look = camera.CFrame.LookVector
+		local right = camera.CFrame.RightVector
+		local up = camera.CFrame.UpVector
+		local dir = Vector3.zero
+
+		if UIS:IsKeyDown(Enum.KeyCode.W) then dir += look end
+		if UIS:IsKeyDown(Enum.KeyCode.S) then dir -= look end
+		if UIS:IsKeyDown(Enum.KeyCode.D) then dir += right end
+		if UIS:IsKeyDown(Enum.KeyCode.A) then dir -= right end
+		if UIS:IsKeyDown(Enum.KeyCode.Space) then dir += up end
+		if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= up end
+
+		if dir.Magnitude > 0 then
+			root.CFrame = CFrame.new(root.Position + dir.Unit * speed * dt) * camera.CFrame.Rotation
+		else
+			root.CFrame = CFrame.new(root.Position) * camera.CFrame.Rotation
+		end
+	end))
+end
+
+if player.Character then task.spawn(onCharacterAdded, player.Character) end
+player.CharacterAdded:Connect(onCharacterAdded)
+
+local lastCheck = 0
+local ESP_INTERVAL = 1.0
+
+RunService.Heartbeat:Connect(function()
+	local now = tick()
+	if now - lastCheck < ESP_INTERVAL then return end
+	lastCheck = now
+
+	local ok, err = pcall(function()
+
+		local currentRooms = workspace:FindFirstChild("CurrentRooms")
+
+		if doorEspEnabled and currentRooms then
+			for _, room in ipairs(currentRooms:GetChildren()) do
+				for _, door in ipairs(collectDoorsInRoom(room)) do
+					addEntityESP(door, "DoorESP_Highlight", Color3.fromRGB(0, 255, 100))
+					addBillboard(door, "DoorESP_Label", "Door", Color3.fromRGB(0, 255, 100))
+				end
+			end
+		end
+
+		if keyEspEnabled and currentRooms then
+			for _, room in ipairs(currentRooms:GetChildren()) do
+				local key = findKeyInRoom(room)
+				if key then
+					local target = key
+					if key:FindFirstChild("Hitbox") and key.Hitbox:FindFirstChild("Key") then
+						target = key.Hitbox.Key
+					elseif key:FindFirstChild("Key") then
+						target = key.Key
+					end
+					addEntityESP(target, "KeyESP_Highlight", Color3.fromRGB(255, 220, 50))
+					addBillboard(target, "KeyESP_Label", "Key", Color3.fromRGB(255, 220, 50))
+				end
+			end
+		end
+
+		if leverEspEnabled and currentRooms then
+			for _, room in ipairs(currentRooms:GetChildren()) do
+				local lever = findLeverInRoom(room)
+				if lever then
+					addEntityESP(lever, "LeverESP_Highlight", Color3.fromRGB(0, 170, 255))
+					addBillboard(lever, "LeverESP_Label", "Lever", Color3.fromRGB(0, 170, 255))
+				end
+			end
+		end
+
+		if bookEspEnabled then
+			for _, book in ipairs(getBooks()) do
+				addEntityESP(book, "BookESP_Highlight", Color3.fromRGB(255, 215, 0))
+				addBillboard(book, "BookESP_Label", "Hint Book", Color3.fromRGB(255, 215, 0))
+			end
+		end
+
+		if itemsEspEnabled then
+			local drops = workspace:FindFirstChild("Drops")
+			if drops then
+				for _, item in ipairs(drops:GetChildren()) do
+					local target = item
+					if not (item:IsA("BasePart") or item:IsA("Model")) then
+						target = item:FindFirstChildWhichIsA("Model", true)
+							or item:FindFirstChildWhichIsA("BasePart", true)
+					end
+					if target then
+						addEntityESP(target, "ItemsESP_Highlight", Color3.fromRGB(0, 220, 255))
+						addBillboard(target, "ItemsESP_Label", item.Name, Color3.fromRGB(0, 220, 255))
+					end
+				end
+			end
+		end
+
+		if playerEspEnabled then
+			for _, p in ipairs(Players:GetPlayers()) do
+				if p ~= player and p.Character then
+					addEntityESP(p.Character, "PlayerESP_Highlight", Color3.fromRGB(0, 255, 255))
+				end
+			end
+		end
+
+		if playerNamesEnabled then
+			for _, p in ipairs(Players:GetPlayers()) do
+				if p ~= player and p.Character then
+					local head = p.Character:FindFirstChild("Head")
+					if head then
+						addBillboard(head, "PlayerESP_Name", p.Name, Color3.fromRGB(0, 255, 255))
+					end
+				end
+			end
+		end
+
+		if rushEspEnabled then
+			local e = getEntity("Rush")
+			addEntityESP(e, "RushESP_Highlight", Color3.fromRGB(255, 50, 50))
+			addBillboard(e, "RushESP_Label", "Rush", Color3.fromRGB(255, 50, 50))
+		end
+		if sallyEspEnabled then
+			local e = getEntity("Sally")
+			addEntityESP(e, "SallyESP_Highlight", Color3.fromRGB(255, 100, 180))
+			addBillboard(e, "SallyESP_Label", "Sally", Color3.fromRGB(255, 100, 180))
+		end
+		if ambushEspEnabled then
+			local e = getEntity("Ambush")
+			addEntityESP(e, "AmbushESP_Highlight", Color3.fromRGB(0, 255, 150))
+			addBillboard(e, "AmbushESP_Label", "Ambush", Color3.fromRGB(0, 255, 150))
+		end
+		if jeffEspEnabled then
+			local e = getEntity("Jeff")
+			addEntityESP(e, "JeffESP_Highlight", Color3.fromRGB(180, 0, 0))
+			addBillboard(e, "JeffESP_Label", "Jeff", Color3.fromRGB(180, 0, 0))
+		end
+		if scribblesEspEnabled then
+			local e = getEntity("Scribbles")
+			addEntityESP(e, "ScribblesESP_Highlight", Color3.fromRGB(200, 200, 255))
+			addBillboard(e, "ScribblesESP_Label", "Scribbles", Color3.fromRGB(200, 200, 255))
+		end
+		if brambleEspEnabled then
+			local e = getEntity("Bramble")
+			addEntityESP(e, "BrambleESP_Highlight", Color3.fromRGB(100, 255, 100))
+			addBillboard(e, "BrambleESP_Label", "Bramble", Color3.fromRGB(100, 255, 100))
+		end
+		if dronesEspEnabled then
+			local e = getEntity("Drones")
+			addEntityESP(e, "DronesESP_Highlight", Color3.fromRGB(150, 150, 255))
+			addBillboard(e, "DronesESP_Label", "Drones", Color3.fromRGB(150, 150, 255))
+		end
+		if eyesEspEnabled then
+			local e = getEntity("Eyes")
+			addEntityESP(e, "EyesESP_Highlight", Color3.fromRGB(170, 0, 255))
+			addBillboard(e, "EyesESP_Label", "Eyes", Color3.fromRGB(170, 0, 255))
+		end
+		if blitzEspEnabled then
+			local e = getEntity("Blitz")
+			addEntityESP(e, "BlitzESP_Highlight", Color3.fromRGB(255, 80, 0))
+			addBillboard(e, "BlitzESP_Label", "Blitz", Color3.fromRGB(255, 80, 0))
+		end
+		if a60EspEnabled then
+			local e = getEntity("A60")
+			addEntityESP(e, "A60ESP_Highlight", Color3.fromRGB(255, 0, 80))
+			addBillboard(e, "A60ESP_Label", "A-60", Color3.fromRGB(255, 0, 80))
+		end
+		if a120EspEnabled then
+			local e = getEntity("A120")
+			addEntityESP(e, "A120ESP_Highlight", Color3.fromRGB(255, 0, 120))
+			addBillboard(e, "A120ESP_Label", "A-120", Color3.fromRGB(255, 0, 120))
+		end
+		if bashEspEnabled then
+			local e = getEntity("Bash")
+			addEntityESP(e, "BashESP_Highlight", Color3.fromRGB(255, 120, 0))
+			addBillboard(e, "BashESP_Label", "Bash", Color3.fromRGB(255, 120, 0))
+		end
+		if lookmanEspEnabled then
+			local e = getEntity("Lookman")
+			addEntityESP(e, "LookmanESP_Highlight", Color3.fromRGB(100, 200, 255))
+			addBillboard(e, "LookmanESP_Label", "Lookman", Color3.fromRGB(100, 200, 255))
+		end
+		if seekEspEnabled then
+			local e = getEntity("Seek")
+			addEntityESP(e, "SeekESP_Highlight", Color3.fromRGB(150, 0, 255))
+			addBillboard(e, "SeekESP_Label", "Seek", Color3.fromRGB(150, 0, 255))
+		end
+		if figureEspEnabled then
+			local e = getEntity("Figure")
+			addEntityESP(e, "FigureESP_Highlight", Color3.fromRGB(255, 0, 0))
+			addBillboard(e, "FigureESP_Label", "Figure", Color3.fromRGB(255, 0, 0))
+		end
+		if screechEspEnabled then
+			local e = getEntity("Screech")
+			addEntityESP(e, "ScreechESP_Highlight", Color3.fromRGB(255, 0, 60))
+			addBillboard(e, "ScreechESP_Label", "Screech", Color3.fromRGB(255, 0, 60))
+		end
+		if tellerEspEnabled then
+			local e = getEntity("Teller")
+			addEntityESP(e, "TellerESP_Highlight", Color3.fromRGB(255, 150, 0))
+			addBillboard(e, "TellerESP_Label", "Teller", Color3.fromRGB(255, 150, 0))
+		end
+		if creakEspEnabled then
+			local e = getEntity("Creak")
+			addEntityESP(e, "CreakESP_Highlight", Color3.fromRGB(180, 100, 255))
+			addBillboard(e, "CreakESP_Label", "Creak", Color3.fromRGB(180, 100, 255))
+		end
+
+		if sallyWarningEnabled then
+			local obj = getEntity("Sally")
+			if obj and not sallyAlreadyWarned then
+				sallyAlreadyWarned = true
+				showDoorsAchievement("SALLY HAS SPAWNED", "Give her the horse!", Color3.fromRGB(255, 100, 180))
+			elseif not obj then sallyAlreadyWarned = false end
+		end
+
+		if rushWarningEnabled then
+			local obj = getEntity("Rush")
+			if obj and not rushAlreadyWarned then
+				rushAlreadyWarned = true
+				showDoorsAchievement("RUSH HAS SPAWNED", "Hide now!", Color3.fromRGB(255, 50, 50))
+			elseif not obj then rushAlreadyWarned = false end
+		end
+
+		if ambushWarningEnabled then
+			local obj = getEntity("Ambush")
+			if obj and not ambushAlreadyWarned then
+				ambushAlreadyWarned = true
+				showDoorsAchievement("AMBUSH HAS SPAWNED", "Get ready to loop!", Color3.fromRGB(0, 255, 150))
+			elseif not obj then ambushAlreadyWarned = false end
+		end
+
+		if jeffWarningEnabled then
+			local obj = getEntity("Jeff")
+			if obj and not jeffAlreadyWarned then
+				jeffAlreadyWarned = true
+				showDoorsAchievement("JEFF THE KILLER", "He's nearby...", Color3.fromRGB(180, 0, 0))
+			elseif not obj then jeffAlreadyWarned = false end
+		end
+
+		if scribblesWarningEnabled then
+			local obj = getEntity("Scribbles")
+			if obj and not scribblesAlreadyWarned then
+				scribblesAlreadyWarned = true
+				showDoorsAchievement("SCRIBBLES DETECTED", "Watch out!", Color3.fromRGB(200, 200, 255))
+			elseif not obj then scribblesAlreadyWarned = false end
+		end
+
+		if brambleWarningEnabled then
+			local obj = getEntity("Bramble")
+			if obj and not brambleAlreadyWarned then
+				brambleAlreadyWarned = true
+				showDoorsAchievement("BRAMBLE HAS SPAWNED", "Stay alert!", Color3.fromRGB(100, 255, 100))
+			elseif not obj then brambleAlreadyWarned = false end
+		end
+
+		if eyesWarningEnabled then
+			local obj = getEntity("Eyes")
+			if obj and not eyesAlreadyWarned then
+				eyesAlreadyWarned = true
+				showDoorsAchievement("EYES HAS SPAWNED", "Look away!", Color3.fromRGB(170, 0, 255))
+			elseif not obj then eyesAlreadyWarned = false end
+		end
+
+		if blitzWarningEnabled then
+			local obj = getEntity("Blitz")
+			if obj and not blitzAlreadyWarned then
+				blitzAlreadyWarned = true
+				showDoorsAchievement("BLITZ HAS SPAWNED", "Hide quickly!", Color3.fromRGB(255, 80, 0))
+			elseif not obj then blitzAlreadyWarned = false end
+		end
+
+		if a60WarningEnabled then
+			local obj = getEntity("A60")
+			if obj and not a60AlreadyWarned then
+				a60AlreadyWarned = true
+				showDoorsAchievement("A-60 HAS SPAWNED", "Get out of the way!", Color3.fromRGB(255, 0, 80))
+			elseif not obj then a60AlreadyWarned = false end
+		end
+
+		if a120WarningEnabled then
+			local obj = getEntity("A120")
+			if obj and not a120AlreadyWarned then
+				a120AlreadyWarned = true
+				showDoorsAchievement("A-120 HAS SPAWNED", "Hide now!", Color3.fromRGB(255, 0, 120))
+			elseif not obj then a120AlreadyWarned = false end
+		end
+
+		if bashWarningEnabled then
+			local obj = getEntity("Bash")
+			if obj and not bashAlreadyWarned then
+				bashAlreadyWarned = true
+				showDoorsAchievement("BASH HAS SPAWNED", "Get ready!", Color3.fromRGB(255, 120, 0))
+			elseif not obj then bashAlreadyWarned = false end
+		end
+
+		if lookmanWarningEnabled then
+			local obj = getEntity("Lookman")
+			if obj and not lookmanAlreadyWarned then
+				lookmanAlreadyWarned = true
+				showDoorsAchievement("LOOKMAN HAS SPAWNED", "Don't look at him!", Color3.fromRGB(100, 200, 255))
+			elseif not obj then lookmanAlreadyWarned = false end
+		end
+
+		if tellerWarningEnabled then
+			local obj = getEntity("Teller")
+			if obj and not tellerAlreadyWarned then
+				tellerAlreadyWarned = true
+				showDoorsAchievement("TELLER DETECTED", "He is Annoying.", Color3.fromRGB(255, 150, 0))
+			elseif not obj then tellerAlreadyWarned = false end
+		end
+
+		if creakWarningEnabled then
+			local obj = getEntity("Creak")
+			if obj and not creakAlreadyWarned then
+				creakAlreadyWarned = true
+				showDoorsAchievement("CREAK HAS SPAWNED", "Watch your back!", Color3.fromRGB(180, 100, 255))
+			elseif not obj then creakAlreadyWarned = false end
+		end
+
+		if seekWarningEnabled then
+			local seek = getEntity("Seek")
+			if seek and not seekAlreadyWarned then
+				seekAlreadyWarned = true
+				showDoorsAchievement("SEEK HAS SPAWNED", "RUN AS FAST AS YOU CAN!", Color3.fromRGB(150, 0, 255))
+			elseif not seek then seekAlreadyWarned = false end
+
+			local eyeCount = countSeekEyes()
+			if eyeCount == 1 and not seekEyesAlreadyWarned then
+				seekEyesAlreadyWarned = true
+				showDoorsAchievement("SEEK IS COMING", "Be aware - Seek is moving", Color3.fromRGB(170, 0, 255))
+			elseif eyeCount ~= 1 then seekEyesAlreadyWarned = false end
+		end
+
+		if figureWarningEnabled then
+			local rig = getEntity("Figure")
+			if rig and not figureAlreadyWarned then
+				figureAlreadyWarned = true
+				showDoorsAchievement("FIGURE HAS SPAWNED", "Don't let it catch you!", Color3.fromRGB(255, 255, 255))
+			elseif not rig then figureAlreadyWarned = false end
+		end
+
+		if bookWarningEnabled then
+			local books = getBooks()
+			local hasBook = #books > 0
+			if hasBook and not bookAlreadyWarned then
+				bookAlreadyWarned = true
+				showDoorsAchievement("HINT BOOK FOUND", "A LiveHintBook has spawned!", Color3.fromRGB(255, 215, 0))
+			elseif not hasBook then bookAlreadyWarned = false end
+		end
+
+		if screechWarningEnabled then
+			local screech = getEntity("Screech")
+			if screech and not screechAlreadyWarned then
+				screechAlreadyWarned = true
+				showDoorsAchievement("SCREECH HAS SPAWNED", "LOOK OUT!", Color3.fromRGB(255, 0, 60))
+			elseif not screech then screechAlreadyWarned = false end
+		end
+	end)
+end)
+
+local old = playerGui:FindFirstChild("SliderSwitchPanel")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "SliderSwitchPanel"
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999
+gui.IgnoreGuiInset = true
+gui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(460, 400)
+frame.Position = UDim2.new(0.5, -230, 0.12, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 28)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.ClipsDescendants = true
+frame.Parent = gui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+local top = Instance.new("Frame")
+top.Size = UDim2.new(1, 0, 0, 36)
+top.BackgroundColor3 = Color3.fromRGB(38, 38, 42)
+top.BorderSizePixel = 0
+top.Parent = frame
+Instance.new("UICorner", top).CornerRadius = UDim.new(0, 12)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -80, 1, 0)
+title.Position = UDim2.fromOffset(14, 0)
+title.BackgroundTransparency = 1
+title.Text = "Appollos Really Cool Doors Script"
+title.TextColor3 = Color3.fromRGB(240, 240, 240)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = top
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.fromOffset(26, 26)
+closeBtn.Position = UDim2.new(1, -34, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 14
+closeBtn.Parent = top
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
+
+closeBtn.MouseButton1Click:Connect(function()
+	noclip = false; fly = false
+	if root then root.Anchored = false end
+	if humanoid then humanoid.PlatformStand = false end
+	if fullbrightEnabled then
+		Lighting.Ambient = originalAmbient
+		Lighting.Brightness = originalBrightness
+		Lighting.ClockTime = originalClockTime
+		Lighting.FogEnd = originalFogEnd
+		Lighting.GlobalShadows = originalGlobalShadows
+	end
+	cleanup()
+	gui:Destroy()
+end)
+
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.fromOffset(26, 26)
+minBtn.Position = UDim2.new(1, -66, 0, 5)
+minBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 60)
+minBtn.Text = "-"
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.Parent = top
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 6)
+
+local collapsed = false
+minBtn.MouseButton1Click:Connect(function()
+	collapsed = not collapsed
+	minBtn.Text = collapsed and "+" or "-"
+	local goal = collapsed and UDim2.fromOffset(460, 36) or UDim2.fromOffset(460, 400)
+	TweenService:Create(frame, TweenInfo.new(0.2), {Size = goal}):Play()
+end)
+
+local tabBar = Instance.new("Frame")
+tabBar.Size = UDim2.new(1, 0, 0, 32)
+tabBar.Position = UDim2.fromOffset(0, 36)
+tabBar.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+tabBar.BorderSizePixel = 0
+tabBar.Parent = frame
+
+local function makeScroll()
+	local s = Instance.new("ScrollingFrame")
+	s.Size = UDim2.new(1, 0, 1, -68)
+	s.Position = UDim2.fromOffset(0, 68)
+	s.BackgroundTransparency = 1
+	s.BorderSizePixel = 0
+	s.ScrollBarThickness = 5
+	s.ScrollBarImageColor3 = Color3.fromRGB(120, 120, 130)
+	s.Parent = frame
+	return s
+end
+
+local espScroll = makeScroll()
+espScroll.CanvasSize = UDim2.fromOffset(0, 550)
+
+local warnScroll = makeScroll()
+warnScroll.CanvasSize = UDim2.fromOffset(0, 440)
+warnScroll.Visible = false
+
+local playerScroll = makeScroll()
+playerScroll.CanvasSize = UDim2.fromOffset(0, 320)
+playerScroll.Visible = false
+
+local tabButtons = {}
+local function selectTab(index)
+	for i, btn in ipairs(tabButtons) do
+		if i == index then
+			TweenService:Create(btn, TweenInfo.new(0.15), {
+				BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+			}):Play()
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		else
+			TweenService:Create(btn, TweenInfo.new(0.15), {
+				BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+			}):Play()
+			btn.TextColor3 = Color3.fromRGB(140, 140, 150)
+		end
+	end
+	espScroll.Visible    = (index == 1)
+	warnScroll.Visible   = (index == 2)
+	playerScroll.Visible = (index == 3)
+end
+
+local function createTab(name, xPos, index)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.fromOffset(120, 32)
+	btn.Position = UDim2.fromOffset(xPos, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(140, 140, 150)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 14
+	btn.BorderSizePixel = 0
+	btn.Parent = tabBar
+	btn.MouseButton1Click:Connect(function() selectTab(index) end)
+	table.insert(tabButtons, btn)
+	return btn
+end
+
+createTab("ESP",      0,   1)
+createTab("Warnings", 122, 2)
+createTab("Player",   244, 3)
+
+local espSetters = {}
+local warningSetters = {}
+
+local function createSwitch(parent, text, xPos, yPos, callback)
+	local holder = Instance.new("Frame")
+	holder.Size = UDim2.fromOffset(210, 34)
+	holder.Position = UDim2.fromOffset(xPos, yPos)
+	holder.BackgroundTransparency = 1
+	holder.Parent = parent
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0, 130, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = Color3.fromRGB(230, 230, 230)
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 13
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = holder
+
+	local track = Instance.new("TextButton")
+	track.Size = UDim2.fromOffset(48, 24)
+	track.Position = UDim2.new(1, -52, 0.5, -12)
+	track.BackgroundColor3 = Color3.fromRGB(55, 55, 60)
+	track.Text = ""
+	track.AutoButtonColor = false
+	track.Parent = holder
+	Instance.new("UICorner", track).CornerRadius = UDim.new(1, 0)
+
+	local knob = Instance.new("Frame")
+	knob.Size = UDim2.fromOffset(20, 20)
+	knob.Position = UDim2.fromOffset(2, 2)
+	knob.BackgroundColor3 = Color3.new(1, 1, 1)
+	knob.Parent = track
+	Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+	local enabled = false
+	local function setState(newState)
+		if enabled == newState then return end
+		enabled = newState
+		local pos = enabled and UDim2.fromOffset(26, 2) or UDim2.fromOffset(2, 2)
+		local col = enabled and Color3.fromRGB(70, 200, 110) or Color3.fromRGB(55, 55, 60)
+		TweenService:Create(knob, TweenInfo.new(0.18), {Position = pos}):Play()
+		TweenService:Create(track, TweenInfo.new(0.18), {BackgroundColor3 = col}):Play()
+		callback(enabled)
+	end
+
+	track.MouseButton1Click:Connect(function()
+		setState(not enabled)
+	end)
+
+	return setState
+end
+
+local function createButton(parent, text, xPos, yPos, width, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.fromOffset(width or 210, 32)
+	btn.Position = UDim2.fromOffset(xPos, yPos)
+	btn.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(240, 240, 240)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 13
+	btn.Parent = parent
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end
+
+table.insert(espSetters, createSwitch(espScroll, "Door Esp", 12, 8, function(s) doorEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Key Esp", 12, 46, function(s) keyEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Lever Esp", 12, 84, function(s) leverEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Book Esp", 12, 122, function(s) bookEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Items Esp", 12, 160, function(s)
+	itemsEspEnabled = s
+	if not s then
+		for _, d in ipairs(workspace:GetDescendants()) do
+			if d.Name == "ItemsESP_Highlight" or d.Name == "ItemsESP_Label" then
+				d:Destroy()
+			end
+		end
+	end
+end))
+table.insert(espSetters, createSwitch(espScroll, "Rush Esp", 12, 198, function(s) rushEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Sally Esp", 12, 236, function(s) sallyEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Ambush Esp", 12, 274, function(s) ambushEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Jeff Esp", 12, 312, function(s) jeffEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Scribbles Esp", 12, 350, function(s) scribblesEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Bramble Esp", 12, 388, function(s) brambleEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Drones Esp", 12, 426, function(s) dronesEspEnabled = s end))
+
+table.insert(espSetters, createSwitch(espScroll, "Teller Esp", 240, 8, function(s) tellerEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Eyes Esp", 240, 46, function(s) eyesEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Blitz Esp", 240, 84, function(s) blitzEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Bash Esp", 240, 122, function(s) bashEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Lookman Esp", 240, 160, function(s) lookmanEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Seek Esp", 240, 198, function(s) seekEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Figure Esp", 240, 236, function(s) figureEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Screech Esp", 240, 274, function(s) screechEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "Creak Esp", 240, 312, function(s) creakEspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "A60 Esp", 240, 350, function(s) a60EspEnabled = s end))
+table.insert(espSetters, createSwitch(espScroll, "A120 Esp", 240, 388, function(s) a120EspEnabled = s end))
+
+createButton(espScroll, "All ESP On", 12, 472, 102, function()
+	for _, setter in ipairs(espSetters) do setter(true) end
+end)
+createButton(espScroll, "All ESP Off", 120, 472, 102, function()
+	for _, setter in ipairs(espSetters) do setter(false) end
+end)
+
+table.insert(warningSetters, createSwitch(warnScroll, "Rush Warning", 12, 8, function(s) rushWarningEnabled = s; rushAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Sally Warning", 12, 46, function(s) sallyWarningEnabled = s; sallyAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Ambush Warning", 12, 84, function(s) ambushWarningEnabled = s; ambushAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Jeff Warning", 12, 122, function(s) jeffWarningEnabled = s; jeffAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Scribbles Warning", 12, 160, function(s) scribblesWarningEnabled = s; scribblesAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Bramble Warning", 12, 198, function(s) brambleWarningEnabled = s; brambleAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Teller Warning", 12, 236, function(s) tellerWarningEnabled = s; tellerAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Eyes Warning", 12, 274, function(s) eyesWarningEnabled = s; eyesAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Blitz Warning", 12, 312, function(s) blitzWarningEnabled = s; blitzAlreadyWarned = false end))
+
+table.insert(warningSetters, createSwitch(warnScroll, "Creak Warning", 240, 8, function(s) creakWarningEnabled = s; creakAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "A60 Warning", 240, 46, function(s) a60WarningEnabled = s; a60AlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "A120 Warning", 240, 84, function(s) a120WarningEnabled = s; a120AlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Bash Warning", 240, 122, function(s) bashWarningEnabled = s; bashAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Lookman Warning", 240, 160, function(s) lookmanWarningEnabled = s; lookmanAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Seek Warning", 240, 198, function(s)
+	seekWarningEnabled = s
+	seekAlreadyWarned = false
+	seekEyesAlreadyWarned = false
+end))
+table.insert(warningSetters, createSwitch(warnScroll, "Figure Warning", 240, 236, function(s) figureWarningEnabled = s; figureAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Book Warning", 240, 274, function(s) bookWarningEnabled = s; bookAlreadyWarned = false end))
+table.insert(warningSetters, createSwitch(warnScroll, "Screech Warning", 240, 312, function(s) screechWarningEnabled = s; screechAlreadyWarned = false end))
+
+createButton(warnScroll, "All Warn On", 12, 358, 102, function()
+	for _, setter in ipairs(warningSetters) do setter(true) end
+end)
+createButton(warnScroll, "All Warn Off", 120, 358, 102, function()
+	for _, setter in ipairs(warningSetters) do setter(false) end
+end)
+
+createSwitch(playerScroll, "Noclip", 12, 8, function(s) noclip = s end)
+createSwitch(playerScroll, "Fly", 12, 46, function(s)
+	fly = s
+	if root then root.Anchored = s end
+	if humanoid then humanoid.PlatformStand = s end
+end)
+createSwitch(playerScroll, "Fullbright", 12, 84, function(s)
+	fullbrightEnabled = s
+	if s then
+		Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+		Lighting.Brightness = 2
+		Lighting.ClockTime = 14
+		Lighting.FogEnd = 100000
+		Lighting.GlobalShadows = false
+	else
+		Lighting.Ambient = originalAmbient
+		Lighting.Brightness = originalBrightness
+		Lighting.ClockTime = originalClockTime
+		Lighting.FogEnd = originalFogEnd
+		Lighting.GlobalShadows = originalGlobalShadows
+	end
+end)
+createSwitch(playerScroll, "Player Esp", 12, 122, function(s)
+	playerEspEnabled = s
+	if not s then
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= player and p.Character then
+				local h = p.Character:FindFirstChild("PlayerESP_Highlight")
+				if h then h:Destroy() end
+			end
+		end
+	end
+end)
+createSwitch(playerScroll, "Player Names", 12, 160, function(s)
+	playerNamesEnabled = s
+	if not s then
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= player and p.Character then
+				local head = p.Character:FindFirstChild("Head")
+				if head then
+					local b = head:FindFirstChild("PlayerESP_Name")
+					if b then b:Destroy() end
+				end
+			end
+		end
+	end
+end)
+
+createButton(playerScroll, "Sit", 12, 204, 210, function()
+	if humanoid then humanoid.Sit = not humanoid.Sit end
+end)
+
+selectTab(1)
