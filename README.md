@@ -1,2 +1,2 @@
 # Apollos-Really-Cool-Doors-Script
-ya
+THIS IS MEANT TO LOOK AI FOR A TROLL!!!!!!
